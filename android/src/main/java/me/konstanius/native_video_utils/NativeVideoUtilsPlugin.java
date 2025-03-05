@@ -26,21 +26,35 @@ public class NativeVideoUtilsPlugin implements FlutterPlugin, MethodCallHandler 
 
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
-        if (call.method.equals("getPlatformVersion")) {
-            result.success("Android " + android.os.Build.VERSION.RELEASE);
-        } else if (call.method.equals("trimVideo")) {
-            String inputPath = call.argument("inputPath");
-            String outputPath = call.argument("outputPath");
-            Integer startMs = Integer.parseInt(call.argument("startMs"));
-            Integer endMs = Integer.parseInt(call.argument("endMs"));
+        switch (call.method) {
+            case "trimVideo": {
+                String inputPath = call.argument("inputPath");
+                String outputPath = call.argument("outputPath");
+                Integer startMs = Integer.parseInt(call.argument("startMs"));
+                Integer endMs = Integer.parseInt(call.argument("endMs"));
 
-            try {
-                result.success(VideoUtils.genVideoUsingMuxer(inputPath, outputPath, startMs, endMs, true, true));
-            } catch (Exception e) {
-                result.success(e.toString());
+                try {
+                    result.success(VideoUtils.genVideoUsingMuxer(inputPath, outputPath, startMs, endMs, true, true));
+                } catch (Exception e) {
+                    result.success(e.toString());
+                }
+                break;
             }
-        } else {
-            result.notImplemented();
+            case "rotateVideo": {
+                String inputPath = call.argument("inputPath");
+                String outputPath = call.argument("outputPath");
+                Integer rotationSteps = Integer.parseInt(call.argument("rotationSteps"));
+
+                try {
+                    result.success(VideoUtils.rotateVideo(inputPath, outputPath, rotationSteps));
+                } catch (Exception e) {
+                    result.success(e.toString());
+                }
+                break;
+            }
+            default: {
+                result.notImplemented();
+            }
         }
     }
 

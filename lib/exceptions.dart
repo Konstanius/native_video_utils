@@ -41,7 +41,7 @@ class NVUSourceCorruptException implements NVUException {
 /// Exception thrown when the trimming process fails
 class NVUProcessException implements NVUException {
   @override
-  String message = "An error occurred during the trimming process: ";
+  String message = "An error occurred during the native_video_utils process: ";
 
   NVUProcessException(String message) {
     this.message = this.message + message;

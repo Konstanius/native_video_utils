@@ -26,4 +26,8 @@ abstract class NativeVideoUtilsPlatform extends PlatformInterface {
   Future<String?> trimVideo(String inputPath, String outputPath, int startMs, int endMs) {
     throw UnimplementedError('trimVideo() has not been implemented.');
   }
+
+  Future<String?> rotateVideo(String inputPath, String outputPath, int rotationSteps) {
+    throw UnimplementedError('rotateVideo() has not been implemented.');
+  }
 }

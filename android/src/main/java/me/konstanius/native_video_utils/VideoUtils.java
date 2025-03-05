@@ -131,4 +131,91 @@ public class VideoUtils {
 
         return "";
     }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    public static String rotateVideo(String srcPath, String dstPath, int rotationSteps) {
+        MediaExtractor extractor;
+        extractor = new MediaExtractor();
+        FileDescriptor fd;
+        MediaMuxer muxer;
+
+        try {
+            fd = new FileInputStream(srcPath).getFD();
+        } catch (IOException e) {
+            return "source_file_not_found";
+        }
+
+        try {
+            extractor.setDataSource(fd);
+        } catch (IOException e) {
+            return "source_corrupt";
+        }
+
+        try {
+            muxer = new MediaMuxer(dstPath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
+        } catch (IOException e) {
+            return "target_file_access";
+        }
+
+        int trackIndex = -1;
+        for (int i = 0; i < extractor.getTrackCount(); i++) {
+            MediaFormat format = extractor.getTrackFormat(i);
+            String mime = format.getString(MediaFormat.KEY_MIME);
+            if (mime.startsWith("video")) {
+                extractor.selectTrack(i);
+                trackIndex = muxer.addTrack(format);
+                break;
+            }
+        }
+
+        if (trackIndex == -1) {
+            return "source_corrupt";
+        }
+
+        int rotation;
+        switch (rotationSteps) {
+            case 1:
+                rotation = 90;
+                break;
+            case 2:
+                rotation = 180;
+                break;
+            case 3:
+                rotation = 270;
+                break;
+            default:
+                rotation = 0; // should never happen, as enum is used as input
+        }
+
+        if (rotationSteps < 4) {
+            muxer.setOrientationHint(rotation);
+        }
+
+        muxer.start();
+
+        ByteBuffer buffer = ByteBuffer.allocate(1024 * 1024);
+        MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
+
+        while (true) {
+            int sampleTrackIndex = extractor.getSampleTrackIndex();
+            if (sampleTrackIndex == -1) {
+                break;
+            }
+            info.offset = 0;
+            info.size = extractor.readSampleData(buffer, 0);
+            if (info.size < 0) {
+                break;
+            }
+            info.presentationTimeUs = extractor.getSampleTime();
+            info.flags = extractor.getSampleFlags();
+            muxer.writeSampleData(trackIndex, buffer, info);
+            extractor.advance();
+        }
+
+        muxer.stop();
+        muxer.release();
+        extractor.release();
+
+        return "";
+    }
 }

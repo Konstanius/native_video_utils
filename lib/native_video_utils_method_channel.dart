@@ -18,4 +18,13 @@ class MethodChannelNativeVideoUtils extends NativeVideoUtilsPlatform {
     'endMs': "$endMs",
     });
   }
+
+  @override
+  Future<String?> rotateVideo(String inputPath, String outputPath, int rotationSteps) {
+    return methodChannel.invokeMethod<String>('rotateVideo', {
+    'inputPath': inputPath,
+    'outputPath': outputPath,
+    'rotationSteps': "$rotationSteps",
+    });
+  }
 }
