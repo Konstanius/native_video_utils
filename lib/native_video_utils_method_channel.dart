@@ -10,8 +10,12 @@ class MethodChannelNativeVideoUtils extends NativeVideoUtilsPlatform {
   final methodChannel = const MethodChannel('native_video_utils');
 
   @override
-  Future<String?> getPlatformVersion() async {
-    final version = await methodChannel.invokeMethod<String>('getPlatformVersion');
-    return version;
+  Future<String?> trimVideo(String inputPath, String outputPath, int startMs, int endMs) {
+    return methodChannel.invokeMethod<String>('trimVideo', {
+    'inputPath': inputPath,
+    'outputPath': outputPath,
+    'startMs': "$startMs",
+    'endMs': "$endMs",
+    });
   }
 }

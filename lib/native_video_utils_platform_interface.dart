@@ -23,7 +23,7 @@ abstract class NativeVideoUtilsPlatform extends PlatformInterface {
     _instance = instance;
   }
 
-  Future<String?> getPlatformVersion() {
-    throw UnimplementedError('platformVersion() has not been implemented.');
+  Future<String?> trimVideo(String inputPath, String outputPath, int startMs, int endMs) {
+    throw UnimplementedError('trimVideo() has not been implemented.');
   }
 }
