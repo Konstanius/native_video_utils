@@ -34,7 +34,7 @@ public class NativeVideoUtilsPlugin implements FlutterPlugin, MethodCallHandler 
                 Integer endMs = Integer.parseInt(call.argument("endMs"));
 
                 try {
-                    result.success(VideoUtils.genVideoUsingMuxer(inputPath, outputPath, startMs, endMs, true, true));
+                    result.success(VideoUtils.trimVideo(inputPath, outputPath, startMs, endMs));
                 } catch (Exception e) {
                     result.success(e.toString());
                 }

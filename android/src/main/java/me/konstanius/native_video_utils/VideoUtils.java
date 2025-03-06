@@ -14,7 +14,7 @@ public class VideoUtils {
 
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public static String genVideoUsingMuxer(String srcPath, String dstPath, int startMs, int endMs, boolean useAudio, boolean useVideo) {
+    public static String trimVideo(String srcPath, String dstPath, int startMs, int endMs) {
         if (startMs > 0 && endMs > 0 && startMs >= endMs) {
             return "trim_start_after_end";
         }
@@ -70,9 +70,9 @@ public class VideoUtils {
 
             String mime = format.getString(MediaFormat.KEY_MIME);
             boolean selectCurrentTrack = false;
-            if (mime.startsWith("audio/") && useAudio) {
+            if (mime.startsWith("audio/")) {
                 selectCurrentTrack = true;
-            } else if (mime.startsWith("video/") && useVideo) {
+            } else if (mime.startsWith("video/")) {
                 selectCurrentTrack = true;
             }
             if (selectCurrentTrack) {

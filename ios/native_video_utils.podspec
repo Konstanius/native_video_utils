@@ -11,7 +11,7 @@ A Flutter plugin designed to combat the issue of FFmpeg-Kit being abandoned and 
                        DESC
   s.homepage         = 'http://example.com'
   s.license          = { :file => '../LICENSE' }
-  s.author           = { 'Your Company' => 'email@example.com' }
+  s.author           = { 'Konstanius' => 'eukonstanius@gmail.com' }
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
