@@ -9,26 +9,26 @@ public class NativeVideoUtilsPlugin: NSObject, FlutterPlugin {
   }
 
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-  if let args = argss as? Dictionary<String, Any> {
-    switch call.method {
-    case "trimVideo":
-      let inputPath = args("inputPath")!
-      let outputPath = args("outputPath")!
-      let start = Int(args("startMs")!)!
-      let end = Int(args("endMs")!)!
+    if let args = args as? Dictionary<String, Any> {
+      switch call.method {
+      case "trimVideo":
+        let inputPath = args("inputPath")!
+        let outputPath = args("outputPath")!
+        let start = Int(args("startMs")!)!
+        let end = Int(args("endMs")!)!
 
-      result(VideoUtils.trimVideo(srcPath: inputPath, dstPath: outputPath, startMs: start, endMs: end))
-    case "rotateVideo":
-      let inputPath = args("inputPath")!
-      let outputPath = args("outputPath")!
-      let rotation = Int(args("rotationSteps")!)!
+        result(VideoUtils.trimVideo(srcPath: inputPath, dstPath: outputPath, startMs: start, endMs: end))
+      case "rotateVideo":
+        let inputPath = args("inputPath")!
+        let outputPath = args("outputPath")!
+        let rotation = Int(args("rotationSteps")!)!
 
-      result(VideoUtils.rotateVideo(srcPath: inputPath, dstPath: outputPath, rotationSteps: rotation))
-    default:
-      result(FlutterMethodNotImplemented)
+        result(VideoUtils.rotateVideo(srcPath: inputPath, dstPath: outputPath, rotationSteps: rotation))
+      default:
+        result(FlutterMethodNotImplemented)
+      }
+    } else {
+        result(FlutterMethodNotImplemented)
     }
-  } else {
-      result(FlutterMethodNotImplemented)
-  }
   }
 }
