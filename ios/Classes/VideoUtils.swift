@@ -2,9 +2,7 @@ import AVFoundation
 
 class VideoUtils {
     static func trimVideo(srcPath: String, dstPath: String, startMs: Int, endMs: Int) -> String {
-        guard let sourceAsset = AVURLAsset(url: URL(fileURLWithPath: srcPath)) else {
-            return "source_file_not_found"
-        }
+        let sourceAsset = AVURLAsset(url: URL(fileURLWithPath: srcPath))
 
         let startTime = CMTime(seconds: Double(startMs) / 1000.0, preferredTimescale: 600)
         let endTime = CMTime(seconds: Double(endMs) / 1000.0, preferredTimescale: 600)
@@ -39,9 +37,7 @@ class VideoUtils {
     }
 
     static func rotateVideo(srcPath: String, dstPath: String, rotationSteps: Int) -> String {
-        guard let sourceAsset = AVURLAsset(url: URL(fileURLWithPath: srcPath)) else {
-            return "source_file_not_found"
-        }
+        let sourceAsset = AVURLAsset(url: URL(fileURLWithPath: srcPath))
 
         let composition = AVMutableComposition()
         guard let videoTrack = sourceAsset.tracks(withMediaType: .video).first else {

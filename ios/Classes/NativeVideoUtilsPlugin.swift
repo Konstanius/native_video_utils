@@ -13,16 +13,16 @@ public class NativeVideoUtilsPlugin: NSObject, FlutterPlugin {
     case "trimVideo":
       let inputPath = call.argument("inputPath")!
       let outputPath = call.argument("outputPath")!
-      let start = call.argument("start")!
-      let end = call.argument("end")!
+      let start = call.argument("startMs")!
+      let end = call.argument("endMs")!
 
-      result(VideoUtils.trimVideo(inputPath, outputPath, start, end))
+      result(VideoUtils.trimVideo(srcPath: inputPath, dstPath: outputPath, startMs: start, endMs: end))
     case "rotateVideo":
       let inputPath = call.argument("inputPath")!
       let outputPath = call.argument("outputPath")!
-      let rotation = call.argument("rotation")!
+      let rotation = call.argument("rotationSteps")!
 
-      result(VideoUtils.rotateVideo(inputPath, outputPath, rotation))
+      result(VideoUtils.rotateVideo(srcPath: inputPath, dstPath: outputPath, rotationSteps: rotation))
     default:
       result(FlutterMethodNotImplemented)
     }
