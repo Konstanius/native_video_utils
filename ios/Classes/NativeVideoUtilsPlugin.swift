@@ -14,8 +14,8 @@ public class NativeVideoUtilsPlugin: NSObject, FlutterPlugin {
       case "trimVideo":
         let inputPath = args["inputPath"] as! String
         let outputPath = args["outputPath"] as! String
-        let start = Int(args["startMs"]!) as! String
-        let end = Int(args["endMs"] as String!)!
+        let start = Int(args["startMs"] as! String)!
+        let end = Int(args["endMs"] as! String)!
 
         result(VideoUtils.trimVideo(srcPath: inputPath, dstPath: outputPath, startMs: start, endMs: end))
       case "rotateVideo":
