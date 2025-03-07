@@ -1,43 +1,67 @@
-import AVFoundation
+import AVKit
 
 class VideoUtils {
-    static func trimVideo(srcPath: String, dstPath: String, startMs: Int, endMs: Int) -> String {
-        let sourceAsset = AVURLAsset(url: URL(fileURLWithPath: srcPath))
+    static func trimVideo(srcPath: String, dstPath: String, startMs: Int, endMs: Int) async throws -> URL? {
+        if startMs > 0 && endMs > 0 && startMs >= endMs {
+            return "trim_start_after_end"
+        }
 
         let startTime = CMTime(seconds: Double(startMs) / 1000.0, preferredTimescale: 600)
         let endTime = CMTime(seconds: Double(endMs) / 1000.0, preferredTimescale: 600)
 
-        guard let exportSession = AVAssetExportSession(asset: sourceAsset, presetName: AVAssetExportPresetHighestQuality) else {
-            return "export_session_creation_failed"
+        let srcPathUrl = URL(fileURLWithPath: srcPath)
+
+
+        let fileManager = FileManager.default
+        let inputFile = AVURLAsset(url: srcPathUrl)
+        let composition = AVMutabbleComposition()
+
+        let exportUrl = URL(fileURLWithPattern: dstPath)
+        if fileManager.fileExists(atPath: exportPath) {
+            return "target_file_exists"
         }
 
-        exportSession.outputURL = URL(fileURLWithPath: dstPath)
-        exportSession.outputFileType = .mp4
-        exportSession.timeRange = CMTimeRangeFromTimeToTime(start: startTime, end: endTime)
-
-        let semaphore = DispatchSemaphore(value: 0)
-        var result: String = ""
-
-        exportSession.exportAsynchronously {
-            switch exportSession.status {
-            case .completed:
-                result = ""
-            case .failed:
-                result = "export_failed"
-            case .cancelled:
-                result = "export_cancelled"
-            default:
-                result = "unknown_error"
-            }
-            semaphore.signal()
+        guard let videoCompTrack = composition.addMutableTrack(withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid) else {
+            return "source_corrupt"
+        }
+        guard let audioCompTrack = composition.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid) else {
+            return "source_corrupt"
         }
 
-        semaphore.wait()
-        return result
+        guard let assetVideoTrack = try await inputFile.trackWithTrackID(trackID: videoCompTrack.trackID) else {
+            return "source_corrupt"
+        }
+        guard let assetAudioTrack = try await inputFile.trackWithTrackID(trackID: audioCompTrack.trackID) else {
+            return "source_corrupt"
+        }
+
+        var accumulatedTime = CMTime.zero
+        let durationOfCurrentSlice = CMTimeSubtract(endTime, startTime)
+        let timeRangeForCurrentSlice = CMTimeRangeMake(start: startTime, duration: durationOfCurrentSlice)
+
+        do {
+            try videoCompTrack.insertTimeRange(timeRangeForCurrentSlice, of: assetVideoTrack, at: accumulatedTime)
+            try audioCompTrack.insertTimeRange(timeRangeForCurrentSlice, of: assetAudioTrack, at: accumulatedTime)
+        }
+        catch let error {
+            return "source_corrupt"
+        }
+
+        accumulatedTime = CMTimeAdd(accumulatedTime, durationOfCurrentSlice)
+
+        let exportSession = AVAssetExportSession(asset: composition, presetName: AVAssetExportPresetHighestQuality)
+        exportSession?.outputURL = exportUrl
+        exportSession?.outputFileType = .mp4
+        exportSession?.shouldOptimizeForNetworkUse = true
+
+        await exportSession?.export()
+        return ""
     }
 
     static func rotateVideo(srcPath: String, dstPath: String, rotationSteps: Int) -> String {
-        let sourceAsset = AVURLAsset(url: URL(fileURLWithPath: srcPath))
+        guard let sourceAsset = AVURLAsset(url: URL(fileURLWithPath: srcPath)) else {
+            return "source_file_not_found"
+        }
 
         let composition = AVMutableComposition()
         guard let videoTrack = sourceAsset.tracks(withMediaType: .video).first else {
